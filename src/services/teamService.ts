@@ -30,10 +30,14 @@ export const TeamService = {
       if (!inviteSnapshot.empty) {
         const teamDoc = inviteSnapshot.docs[0];
         const teamRef = doc(db, 'teams', teamDoc.id);
-        const members = teamDoc.data().members || [];
+        const data = teamDoc.data();
+        const members = data.members || [];
+        const roles = data.roles || {};
+        
         if (!members.includes(userId)) {
           await updateDoc(teamRef, {
-            members: [...members, userId]
+            members: [...members, userId],
+            roles: { ...roles, [userId]: 'member' }
           });
         }
         return teamDoc.id;
@@ -46,6 +50,7 @@ export const TeamService = {
       name: requestedName || 'My Workspace',
       ownerId: userId,
       members: [userId],
+      roles: { [userId]: 'admin' },
       invitedEmails: [],
       createdAt: serverTimestamp()
     });
@@ -54,19 +59,43 @@ export const TeamService = {
   },
 
   getTeamMembers: async (teamId: string) => {
-    const teamDoc = await getDoc(doc(db, 'teams', teamId));
-    if (!teamDoc.exists()) return [];
-    
-    const memberIds = teamDoc.data().members || [];
-    const members = [];
-    
-    for (const uid of memberIds) {
-      const userSnap = await getDoc(doc(db, 'users', uid));
-      if (userSnap.exists()) {
-        members.push({ uid, ...userSnap.data() });
+    try {
+      const teamDoc = await getDoc(doc(db, 'teams', teamId));
+      if (!teamDoc.exists()) return [];
+      
+      const teamData = teamDoc.data();
+      const memberIds = teamData.members || [];
+      const roles = teamData.roles || {};
+      
+      if (memberIds.length === 0) return [];
+
+      // Batch fetch users using documentId() in query
+      // Limit of 30 for 'in' queries in Firestore
+      const members: any[] = [];
+      const chunks = [];
+      for (let i = 0; i < memberIds.length; i += 30) {
+        chunks.push(memberIds.slice(i, i + 30));
       }
+
+      for (const chunk of chunks) {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('__name__', 'in', chunk));
+        const userSnaps = await getDocs(q);
+        userSnaps.forEach(snap => {
+          const uid = snap.id;
+          members.push({ 
+            uid, 
+            ...snap.data(),
+            role: roles[uid] || 'member' 
+          });
+        });
+      }
+
+      return members;
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      return [];
     }
-    return members;
   },
 
   inviteMember: async (teamId: string, email: string) => {

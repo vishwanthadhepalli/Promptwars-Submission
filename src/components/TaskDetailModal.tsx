@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Calendar, Flag, User, Trash2, Save, 
   CheckCircle2, Clock, AlertCircle, Loader2,
-  ChevronRight
+  ChevronRight, Shield, Lock
 } from 'lucide-react';
 import { Task, TaskService } from '../services/taskService';
 import { TeamService } from '../services/teamService';
+import { useAuth } from '../hooks/useFirebase';
 
 interface TaskDetailModalProps {
   task: Task;
@@ -17,10 +18,19 @@ interface TaskDetailModalProps {
 }
 
 export default function TaskDetailModal({ task, teamId, onClose, onUpdate, onDelete }: TaskDetailModalProps) {
+  const { user } = useAuth();
   const [editedTask, setEditedTask] = useState<Task>(task);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const currentUserInTeam = teamMembers.find(m => m.uid === user?.uid);
+  const isAdmin = currentUserInTeam?.role === 'admin';
+  const isCreator = task.creatorId === user?.uid;
+  const isAssignee = task.assigneeId === user?.uid;
+
+  const canEdit = isAdmin || isCreator || isAssignee;
+  const canDelete = isAdmin || isCreator;
 
   useEffect(() => {
     const loadTeam = async () => {
@@ -80,35 +90,49 @@ export default function TaskDetailModal({ task, teamId, onClose, onUpdate, onDel
         {/* Header */}
         <div className="p-8 border-b border-[#F1F5F9] flex justify-between items-start">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#64748B]">
-              <Clock className="w-3 h-3" /> Task Details
-              <ChevronRight className="w-3 h-3" />
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#475569]">
+              <Clock className="w-3 h-3" aria-hidden="true" /> Task Details
+              <ChevronRight className="w-3 h-3" aria-hidden="true" />
               <span className="text-[#4F46E5]">{task.id.slice(0, 8)}</span>
             </div>
             <input 
+              aria-label="Task Title"
               value={editedTask.title}
               onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
               className="text-3xl font-black text-[#0F172A] tracking-tighter w-full bg-transparent border-none focus:ring-0 p-0"
               placeholder="Task Title"
             />
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[#F1F5F9] rounded-full transition-colors">
-            <X className="w-6 h-6 text-[#64748B]" />
+          <button 
+            onClick={onClose} 
+            aria-label="Close modal"
+            className="p-2 hover:bg-[#F1F5F9] rounded-full transition-colors"
+          >
+            <X className="w-6 h-6 text-[#475569]" />
           </button>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8 space-y-10">
+          {!canEdit && (
+            <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-xl flex items-center gap-3 text-yellow-700 mb-4">
+              <Lock className="w-4 h-4" />
+              <span className="text-[10px] font-black uppercase tracking-widest leading-none">ReadOnly Mode — Only assigned owners or admins can modify this task.</span>
+            </div>
+          )}
+
           {/* Main Controls */}
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-                <Flag className="w-3 h-3" /> Priority
+              <label htmlFor="task-priority" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+                <Flag className="w-3 h-3" aria-hidden="true" /> Priority
               </label>
               <select 
+                id="task-priority"
+                disabled={!canEdit}
                 value={editedTask.priority}
                 onChange={(e) => setEditedTask({ ...editedTask, priority: e.target.value as any })}
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5] disabled:opacity-50 text-[#0F172A]"
               >
                 <option value="low">Low Priority</option>
                 <option value="medium">Medium Priority</option>
@@ -116,13 +140,15 @@ export default function TaskDetailModal({ task, teamId, onClose, onUpdate, onDel
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-                <CheckCircle2 className="w-3 h-3" /> Status
+              <label htmlFor="task-status" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+                <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> Status
               </label>
               <select 
+                id="task-status"
+                disabled={!canEdit}
                 value={editedTask.status}
                 onChange={(e) => setEditedTask({ ...editedTask, status: e.target.value as any })}
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5] disabled:opacity-50 text-[#0F172A]"
               >
                 <option value="todo">To Do</option>
                 <option value="in-progress">In Progress</option>
@@ -134,36 +160,42 @@ export default function TaskDetailModal({ task, teamId, onClose, onUpdate, onDel
           {/* Dates */}
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-                <Calendar className="w-3 h-3" /> Start Date
+              <label htmlFor="start-date" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+                <Calendar className="w-3 h-3" aria-hidden="true" /> Start Date
               </label>
               <input 
+                id="start-date"
+                disabled={!canEdit}
                 type="date"
                 value={editedTask.startDate || ''}
                 onChange={(e) => setEditedTask({ ...editedTask, startDate: e.target.value })}
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5] disabled:opacity-50 text-[#0F172A]"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-                <Calendar className="w-3 h-3" /> Due Date
+              <label htmlFor="due-date" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+                <Calendar className="w-3 h-3" aria-hidden="true" /> Due Date
               </label>
               <input 
+                id="due-date"
+                disabled={!canEdit}
                 type="date"
                 value={editedTask.dueDate || ''}
                 onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value })}
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5] disabled:opacity-50 text-[#0F172A]"
               />
             </div>
           </div>
 
           {/* Assignee */}
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-              <User className="w-3 h-3" /> Assigned Owner
+            <label htmlFor="task-assignee" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+              <User className="w-3 h-3" aria-hidden="true" /> Assigned Owner
             </label>
             <div className="grid grid-cols-1 gap-2">
               <select 
+                id="task-assignee"
+                disabled={!canEdit}
                 value={editedTask.assigneeId || ''}
                 onChange={(e) => {
                   const member = teamMembers.find(m => m.uid === e.target.value);
@@ -173,7 +205,7 @@ export default function TaskDetailModal({ task, teamId, onClose, onUpdate, onDel
                     assignee: member?.displayName || 'Unassigned'
                   });
                 }}
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-[#4F46E5] disabled:opacity-50 text-[#0F172A]"
               >
                 <option value="">Unassigned</option>
                 {teamMembers.map(member => (
@@ -185,13 +217,15 @@ export default function TaskDetailModal({ task, teamId, onClose, onUpdate, onDel
 
           {/* Description */}
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-              <AlertCircle className="w-3 h-3" /> Description
+            <label htmlFor="task-desc" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+              <AlertCircle className="w-3 h-3" aria-hidden="true" /> Description
             </label>
             <textarea 
+              id="task-desc"
+              disabled={!canEdit}
               value={editedTask.description || ''}
               onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
-              className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-medium text-sm outline-none focus:ring-2 focus:ring-[#4F46E5] min-h-[120px] resize-none"
+              className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-4 py-3 font-medium text-sm outline-none focus:ring-2 focus:ring-[#4F46E5] min-h-[120px] resize-none disabled:opacity-50 text-[#0F172A]"
               placeholder="Elaborate on the task objectives..."
             />
           </div>
@@ -199,29 +233,33 @@ export default function TaskDetailModal({ task, teamId, onClose, onUpdate, onDel
 
         {/* Footer */}
         <div className="p-8 border-t border-[#F1F5F9] flex justify-between items-center bg-[#F9FAFB]">
-          <button 
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors"
-          >
-            {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-            Delete Task
-          </button>
+          {canDelete ? (
+            <button 
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors"
+            >
+              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              Delete Task
+            </button>
+          ) : <div />}
           <div className="flex gap-4">
             <button 
               onClick={onClose}
               className="px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] text-[#64748B] hover:bg-white transition-all"
             >
-              Cancel
+              {canEdit ? 'Cancel' : 'Close'}
             </button>
-            <button 
-              onClick={handleSave}
-              disabled={isSaving}
-              className="bg-[#0F172A] text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2 hover:bg-black transition-all shadow-xl shadow-blue-900/20"
-            >
-              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Save Changes
-            </button>
+            {canEdit && (
+              <button 
+                onClick={handleSave}
+                disabled={isSaving}
+                className="bg-[#0F172A] text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2 hover:bg-black transition-all shadow-xl shadow-blue-900/20"
+              >
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Save Changes
+              </button>
+            )}
           </div>
         </div>
       </motion.div>

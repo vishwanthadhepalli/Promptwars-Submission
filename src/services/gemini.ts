@@ -1,32 +1,26 @@
-import { GoogleGenAI, Type } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
-
-export const geminiModel = "gemini-3-flash-preview";
+// Frontend Proxy Service for AI
+// Moving all AI logic to the backend to protect API keys
 
 export async function analyzeIntake(input: string) {
-  const response = await ai.models.generateContent({
-    model: geminiModel,
-    contents: `You are an expert project manager. Analyze this input (could be messy notes, email, or a meeting transcript) and extract a list of actionable tasks. 
-    If there are multiple deliverables mentioned, return multiple tasks. 
-    Notes: "${input}"`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
+  const response = await fetch("/api/ai/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt: `You are an expert project manager. Analyze this input and extract tasks. Notes: "${input}"`,
+      schema: {
+        type: "object",
         properties: {
           tasks: {
-            type: Type.ARRAY,
+            type: "array",
             items: {
-              type: Type.OBJECT,
+              type: "object",
               properties: {
-                title: { type: Type.STRING },
-                description: { type: Type.STRING },
-                priority: { type: Type.STRING, enum: ["low", "medium", "high"] },
-                dueDate: { type: Type.STRING },
-                assignee: { type: Type.STRING },
-                tags: { type: Type.ARRAY, items: { type: Type.STRING } },
-                dependencies: { type: Type.ARRAY, items: { type: Type.STRING } }
+                title: { type: "string" },
+                description: { type: "string" },
+                priority: { type: "string", enum: ["low", "medium", "high"] },
+                dueDate: { type: "string" },
+                assignee: { type: "string" },
+                tags: { type: "array", items: { type: "string" } }
               },
               required: ["title", "priority"]
             }
@@ -34,74 +28,97 @@ export async function analyzeIntake(input: string) {
         },
         required: ["tasks"]
       }
-    }
+    })
   });
 
-  const parsed = JSON.parse(response.text);
-  return parsed.tasks;
+  if (!response.ok) {
+    const errData = await response.json();
+    throw new Error(errData.error || "AI Analysis failed");
+  }
+
+  const result = await response.json();
+  return result.tasks;
 }
 
 export async function generateDailyBriefing(tasks: any[], docs: any[]) {
-  const response = await ai.models.generateContent({
-    model: geminiModel,
-    contents: `Generate a daily briefing for a team member based on these tasks: ${JSON.stringify(tasks)} and documents: ${JSON.stringify(docs)}. 
-    Focus on top 3 priorities, blockers, and upcoming risks. Use a concise, professional tone.`,
+  // Creating a simpler one for now, or I can add a specific server route if complex
+  const response = await fetch("/api/ai/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt: `Generate a daily briefing for a team member based on tasks: ${JSON.stringify(tasks)} and docs: ${JSON.stringify(docs)}.`,
+      schema: {
+        type: "object",
+        properties: {
+          briefing: { type: "string" }
+        },
+        required: ["briefing"]
+      }
+    })
   });
 
-  return response.text;
+  if (!response.ok) return "Unable to generate AI briefing at this time.";
+  const result = await response.json();
+  return result.briefing;
 }
 
 export async function generateReport(query: string, data: any) {
-  const response = await ai.models.generateContent({
-    model: geminiModel,
-    contents: `Generate a professional report for the following request: "${query}". Use this data context: ${JSON.stringify(data)}.
-    Include: Executive Summary, Key achievements, Blockers & Risks. 
-    Also suggest a chart type (e.g., Pie, Bar, Line) and data points for visualization.`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
+  const response = await fetch("/api/ai/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt: `Generate report for: "${query}". Context: ${JSON.stringify(data)}`,
+      schema: {
+        type: "object",
         properties: {
-          summary: { type: Type.STRING },
-          achievements: { type: Type.ARRAY, items: { type: Type.STRING } },
-          risks: { type: Type.ARRAY, items: { type: Type.STRING } },
+          summary: { type: "string" },
+          achievements: { type: "array", items: { type: "string" } },
+          risks: { type: "array", items: { type: "string" } },
           chartSuggestions: {
-            type: Type.OBJECT,
+            type: "object",
             properties: {
-              type: { type: Type.STRING },
-              data: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, value: { type: Type.NUMBER } } } }
+              type: { type: "string" },
+              data: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } }
             }
           }
         },
         required: ["summary"]
       }
-    }
+    })
   });
 
-  return JSON.parse(response.text);
+  if (!response.ok) throw new Error("Report generation failed");
+  return await response.json();
 }
 
 export async function analyzeRisks(tasks: any[], workload: any) {
-  const response = await ai.models.generateContent({
-    model: geminiModel,
-    contents: `Analyze team tasks and workload for potential bottlenecks and risks: ${JSON.stringify({ tasks, workload })}. 
-    Predict delays and provide suggestions to reassign or de-prioritize.`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            project: { type: Type.STRING },
-            riskScore: { type: Type.NUMBER },
-            reason: { type: Type.STRING },
-            suggestion: { type: Type.STRING }
+  const response = await fetch("/api/ai/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt: `Analyze bottlenecks: ${JSON.stringify({ tasks, workload })}`,
+      schema: {
+        type: "object",
+        properties: {
+          risks: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                project: { type: "string" },
+                riskScore: { type: "number" },
+                reason: { type: "string" },
+                suggestion: { type: "string" }
+              }
+            }
           }
-        }
+        },
+        required: ["risks"]
       }
-    }
+    })
   });
 
-  return JSON.parse(response.text);
+  if (!response.ok) return [];
+  const result = await response.json();
+  return result.risks;
 }

@@ -92,45 +92,48 @@ export default function RegistrationForm({ onMagicLinkRequest, onGoogleLogin }: 
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-                <User className="w-3 h-3" /> Full Name
-              </label>
-              <input 
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Jane Cooper"
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-5 py-4 focus:ring-2 focus:ring-[#4F46E5] focus:bg-white transition-all font-medium"
-              />
-            </div>
+              <div className="space-y-2">
+                <label htmlFor="full-name" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+                  <User className="w-3 h-3" /> Full Name
+                </label>
+                <input 
+                  id="full-name"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Jane Cooper"
+                  className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-5 py-4 focus:ring-2 focus:ring-[#4F46E5] focus:bg-white transition-all font-medium text-[#0F172A]"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-                <Building2 className="w-3 h-3" /> Company / Workspace Name
-              </label>
-              <input 
-                required
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Newton Research Lab"
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-5 py-4 focus:ring-2 focus:ring-[#4F46E5] focus:bg-white transition-all font-medium"
-              />
-            </div>
+              <div className="space-y-2">
+                <label htmlFor="company-name" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+                  <Building2 className="w-3 h-3" /> Company / Workspace Name
+                </label>
+                <input 
+                  id="company-name"
+                  required
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Newton Research Lab"
+                  className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-5 py-4 focus:ring-2 focus:ring-[#4F46E5] focus:bg-white transition-all font-medium text-[#0F172A]"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#64748B] flex items-center gap-2">
-                <Mail className="w-3 h-3" /> Professional Email
-              </label>
-              <input 
-                required
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jane@company.com"
-                className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-5 py-4 focus:ring-2 focus:ring-[#4F46E5] focus:bg-white transition-all font-medium"
-              />
-            </div>
+              <div className="space-y-2">
+                <label htmlFor="email-address" className="text-[10px] font-black uppercase tracking-widest text-[#475569] flex items-center gap-2">
+                  <Mail className="w-3 h-3" /> Professional Email
+                </label>
+                <input 
+                  id="email-address"
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="jane@company.com"
+                  className="w-full bg-[#F9FAFB] border border-[#E2E8F0] rounded-xl px-5 py-4 focus:ring-2 focus:ring-[#4F46E5] focus:bg-white transition-all font-medium text-[#0F172A]"
+                />
+              </div>
 
             <button 
               type="submit"

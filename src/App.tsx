@@ -167,40 +167,42 @@ export default function App() {
                 </div>
               ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {tasks.map((t, i) => (
-                    <div 
-                      key={t.id || i} 
-                      onClick={() => setSelectedTask(t)}
-                      className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
-                    >
-                      <div className="flex justify-between items-start mb-4">
-                        <div className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${
-                          t.priority === 'high' ? 'bg-[#FEE2E2] text-[#EF4444]' : 
-                          t.priority === 'medium' ? 'bg-[#FEF3C7] text-[#D97706]' : 
-                          'bg-[#F1F5F9] text-[#64748B]'
-                        }`}>{t.priority}</div>
-                        {t.risk && parseInt(t.risk) > 20 && (
-                          <div className="flex items-center gap-1 text-[10px] font-extrabold text-[#EF4444] uppercase">
-                            Risk: {t.risk}
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="font-extrabold text-[#0F172A] text-lg mb-2 leading-tight group-hover:text-[#4F46E5] transition-colors">{t.title}</h3>
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-5 h-5 rounded-full bg-[#E2E8F0] border border-white" />
-                        <span className="text-xs font-semibold text-[#64748B]">{t.assignee || 'Unassigned'}</span>
-                      </div>
-                      <div className="flex justify-between items-center mt-4 pt-4 border-t border-[#F1F5F9]">
-                        <span className="text-[10px] font-black tracking-widest uppercase text-[#64748B]">{t.status}</span>
-                        <div className="flex gap-1">
-                            {t.tags?.map(tag => (
-                              <span key={tag} className="text-[9px] font-bold text-[#64748B] bg-[#F1F5F9] px-1.5 rounded uppercase">{tag}</span>
-                            ))}
+                    {tasks.map((t, i) => (
+                      <button 
+                        key={t.id || i} 
+                        onClick={() => setSelectedTask(t)}
+                        onKeyDown={(e) => e.key === 'Enter' && setSelectedTask(t)}
+                        aria-label={`View details for task: ${t.title}`}
+                        className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer text-left w-full"
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${
+                            t.priority === 'high' ? 'bg-[#FEE2E2] text-[#EF4444]' : 
+                            t.priority === 'medium' ? 'bg-[#FEF3C7] text-[#D97706]' : 
+                            'bg-[#F1F5F9] text-[#475569]'
+                          }`}>{t.priority}</div>
+                          {t.risk && parseInt(t.risk) > 20 && (
+                            <div className="flex items-center gap-1 text-[10px] font-extrabold text-[#EF4444] uppercase">
+                              Risk: {t.risk}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                        <h3 className="font-extrabold text-[#0F172A] text-lg mb-2 leading-tight group-hover:text-[#4F46E5] transition-colors">{t.title}</h3>
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-5 h-5 rounded-full bg-[#E2E8F0] border border-white" />
+                          <span className="text-xs font-semibold text-[#475569]">{t.assignee || 'Unassigned'}</span>
+                        </div>
+                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-[#F1F5F9]">
+                          <span className="text-[10px] font-black tracking-widest uppercase text-[#475569]">{t.status}</span>
+                          <div className="flex gap-1">
+                              {t.tags?.map(tag => (
+                                <span key={tag} className="text-[9px] font-bold text-[#475569] bg-[#F1F5F9] px-1.5 rounded uppercase">{tag}</span>
+                              ))}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
               )}
             </>
           )}

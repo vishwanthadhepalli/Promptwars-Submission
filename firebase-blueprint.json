@@ -24,13 +24,17 @@
           "type": "array",
           "items": { "type": "string" }
         },
+        "roles": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "enum": ["admin", "member"] }
+        },
         "invitedEmails": {
           "type": "array",
           "items": { "type": "string" }
         },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["ownerId", "members", "createdAt"]
+      "required": ["ownerId", "members", "roles", "createdAt"]
     },
     "Task": {
       "title": "Task",

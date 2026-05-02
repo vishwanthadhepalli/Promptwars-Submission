@@ -9,12 +9,15 @@ interface TeamMembersProps {
 }
 
 export default function TeamMembers({ teamId }: TeamMembersProps) {
-  const { sendMagicLink } = useAuth();
+  const { user, sendMagicLink } = useAuth();
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState('');
   const [isInviting, setIsInviting] = useState(false);
   const [invitationSent, setInvitationSent] = useState(false);
+
+  const currentUserMember = members.find(m => m.uid === user?.uid);
+  const isAdmin = currentUserMember?.role === 'admin';
 
   useEffect(() => {
     loadMembers();
@@ -65,51 +68,61 @@ export default function TeamMembers({ teamId }: TeamMembersProps) {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Invite Form */}
+        {/* Invite Form - Only for Admins */}
         <div className="lg:col-span-1">
-          <div className="bg-[#0F172A] rounded-xl p-8 text-white shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-              <UserPlus className="w-32 h-32 text-white" />
-            </div>
-            <div className="relative z-10">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-6 border-b border-white/10 pb-4">Invite Member</h3>
-              <form onSubmit={handleInvite} className="space-y-4">
-                <div>
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                    <input 
-                      type="email"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      placeholder="teammate@company.com"
-                      className="w-full bg-white/5 border border-white/10 rounded-lg py-4 pl-12 pr-4 text-sm font-medium focus:ring-2 focus:ring-[#4F46E5] transition-all"
-                    />
+          {isAdmin ? (
+            <div className="bg-[#0F172A] rounded-xl p-8 text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-5">
+                <UserPlus className="w-32 h-32 text-white" />
+              </div>
+              <div className="relative z-10">
+                <h3 className="text-sm font-black uppercase tracking-widest mb-6 border-b border-white/10 pb-4">Invite Member</h3>
+                <form onSubmit={handleInvite} className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Email Address</label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                      <input 
+                        type="email"
+                        value={inviteEmail}
+                        onChange={(e) => setInviteEmail(e.target.value)}
+                        placeholder="teammate@company.com"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg py-4 pl-12 pr-4 text-sm font-medium focus:ring-2 focus:ring-[#4F46E5] transition-all"
+                      />
+                    </div>
                   </div>
-                </div>
-                <button 
-                  disabled={isInviting}
-                  className="w-full bg-[#4F46E5] text-white py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 hover:bg-[#4338CA] transition-all shadow-xl shadow-blue-900/40"
-                >
-                  {isInviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Send Magic Link <ArrowRight className="w-3 h-3" /></>}
-                </button>
-              </form>
-
-              <AnimatePresence>
-                {invitationSent && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-3 text-green-400"
+                  <button 
+                    disabled={isInviting}
+                    className="w-full bg-[#4F46E5] text-white py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 hover:bg-[#4338CA] transition-all shadow-xl shadow-blue-900/40"
                   >
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Invitation Sent</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    {isInviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Send Magic Link <ArrowRight className="w-3 h-3" /></>}
+                  </button>
+                </form>
+
+                <AnimatePresence>
+                  {invitationSent && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-3 text-green-400"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Invitation Sent</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-[#F1F5F9] rounded-xl p-8 border border-[#E2E8F0]">
+              <Shield className="w-8 h-8 text-[#64748B] mb-4" />
+              <h3 className="text-sm font-black uppercase tracking-widest text-[#0F172A] mb-2">Member View</h3>
+              <p className="text-xs font-bold text-[#64748B] leading-relaxed">
+                You are currently a team member. Only administrators can invite new members or manage workspace settings.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Members List */}
@@ -131,14 +144,19 @@ export default function TeamMembers({ teamId }: TeamMembersProps) {
                       )}
                     </div>
                     <div>
-                      <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-tight group-hover:text-[#4F46E5] transition-colors">{member.displayName}</h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-tight group-hover:text-[#4F46E5] transition-colors">{member.displayName}</h4>
+                        {member.uid === user?.uid && <span className="text-[8px] font-black bg-[#4F46E5] text-white px-1.5 py-0.5 rounded uppercase">You</span>}
+                      </div>
                       <p className="text-xs font-medium text-[#64748B]">{member.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F1F5F9] rounded-full">
-                      <Shield className="w-3 h-3 text-[#4F46E5]" />
-                      <span className="text-[10px] font-black uppercase text-[#64748B] tracking-widest">Member</span>
+                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${member.role === 'admin' ? 'bg-[#4F46E5]/10' : 'bg-[#F1F5F9]'}`}>
+                      <Shield className={`w-3 h-3 ${member.role === 'admin' ? 'text-[#4F46E5]' : 'text-[#64748B]'}`} />
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${member.role === 'admin' ? 'text-[#4F46E5]' : 'text-[#64748B]'}`}>
+                        {member.role}
+                      </span>
                     </div>
                   </div>
                 </div>
