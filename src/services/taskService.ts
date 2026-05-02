@@ -94,6 +94,10 @@ export const TaskService = {
   },
 
   createTask: async (teamId: string, task: Partial<Task>) => {
+    if (!teamId || !task.title) {
+       console.error("Missing required fields for createTask");
+       return null;
+    }
     const path = `teams/${teamId}/tasks`;
     try {
       return await addDoc(collection(db, path), {
@@ -104,10 +108,12 @@ export const TaskService = {
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, path);
+      throw error;
     }
   },
 
   updateTask: async (teamId: string, taskId: string, updates: Partial<Task>) => {
+    if (!teamId || !taskId) return;
     const path = `teams/${teamId}/tasks/${taskId}`;
     try {
       const taskRef = doc(db, path);
@@ -117,6 +123,7 @@ export const TaskService = {
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, path);
+      throw error;
     }
   },
 

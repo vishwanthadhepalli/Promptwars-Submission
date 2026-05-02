@@ -26,19 +26,19 @@ const Dashboard: React.FC<{ tasks: any[]; docs: any[] }> = ({ tasks, docs }) => 
     <div className="space-y-10 max-w-6xl mx-auto">
       <header>
         <h1 className="text-6xl font-black tracking-tighter text-[#0F172A]">WORKSPACE OVERVIEW<span className="text-[#4F46E5]">.</span></h1>
-        <p className="text-[#64748B] font-bold uppercase tracking-widest text-xs mt-4">Precision insights from Gemini Agent</p>
+        <p className="text-[#475569] font-bold uppercase tracking-widest text-xs mt-4">Precision insights from Gemini Agent</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Daily Synthesis */}
         <div className="lg:col-span-2 bg-[#0F172A] text-white rounded-xl p-10 relative overflow-hidden group shadow-2xl shadow-blue-900/10">
           <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Zap className="w-48 h-48 text-white" />
+            <Zap className="w-48 h-48 text-white" aria-hidden="true" />
           </div>
           <div className="relative z-10 flex flex-col h-full">
             <div className="flex items-center gap-2 mb-8">
-              <Sparkles className="w-5 h-5 text-[#4F46E5]" />
-              <span className="text-xs font-black uppercase tracking-[0.3em] text-[#64748B]">DAILY SYNTHESIZER</span>
+              <Sparkles className="w-5 h-5 text-[#4F46E5]" aria-hidden="true" />
+              <span className="text-xs font-black uppercase tracking-[0.3em] text-[#94A3B8]">DAILY SYNTHESIZER</span>
             </div>
             
             <div className="flex-1 text-lg font-medium leading-relaxed prose prose-invert max-w-none">
@@ -65,22 +65,22 @@ const Dashboard: React.FC<{ tasks: any[]; docs: any[] }> = ({ tasks, docs }) => 
         <div className="space-y-8">
           <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-2 mb-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">CRITICAL FOCUS</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#475569]">CRITICAL FOCUS</span>
             </div>
             <div className="space-y-6">
               {tasks.filter(t => t.priority === 'high').slice(0, 3).map((task, i) => (
                 <div key={i} className="group cursor-pointer">
                   <div className="flex justify-between items-center mb-1">
-                    <p className="text-sm font-black uppercase tracking-tight group-hover:text-[#4F46E5] transition-colors">{task.title}</p>
+                    <p className="text-sm font-black uppercase tracking-tight group-hover:text-[#4F46E5] transition-colors text-[#0F172A]">{task.title}</p>
                     <span className="text-[10px] font-black text-[#EF4444]">{task.risk || '0%'}</span>
                   </div>
-                  <div className="h-1 bg-[#F1F5F9] w-full rounded-full overflow-hidden">
+                  <div className="h-1 bg-[#F1F5F9] w-full rounded-full overflow-hidden" role="progressbar" aria-valuenow={parseInt(task.risk || '0')} aria-valuemin={0} aria-valuemax={100}>
                     <div className="h-full bg-[#4F46E5] rounded-full transition-all duration-1000" style={{ width: task.risk || '10%' }} />
                   </div>
                 </div>
               ))}
               {tasks.filter(t => t.priority === 'high').length === 0 && (
-                <p className="text-sm text-[#64748B] italic">All critical path items are clear.</p>
+                <p className="text-sm text-[#475569] italic">All critical path items are clear.</p>
               )}
             </div>
           </div>

@@ -64,7 +64,7 @@ export default function TeamMembers({ teamId }: TeamMembersProps) {
     <div className="max-w-5xl mx-auto space-y-10">
       <header>
         <h1 className="text-6xl font-black tracking-tighter text-[#0F172A]">TEAM ROSTER<span className="text-[#4F46E5]">.</span></h1>
-        <p className="text-[#64748B] font-bold uppercase tracking-widest text-xs mt-4">Manage workspace access and invitations</p>
+        <p className="text-[#475569] font-bold uppercase tracking-widest text-xs mt-4">Manage workspace access and invitations</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -116,9 +116,9 @@ export default function TeamMembers({ teamId }: TeamMembersProps) {
             </div>
           ) : (
             <div className="bg-[#F1F5F9] rounded-xl p-8 border border-[#E2E8F0]">
-              <Shield className="w-8 h-8 text-[#64748B] mb-4" />
+              <Shield className="w-8 h-8 text-[#475569] mb-4" />
               <h3 className="text-sm font-black uppercase tracking-widest text-[#0F172A] mb-2">Member View</h3>
-              <p className="text-xs font-bold text-[#64748B] leading-relaxed">
+              <p className="text-xs font-bold text-[#475569] leading-relaxed">
                 You are currently a team member. Only administrators can invite new members or manage workspace settings.
               </p>
             </div>
@@ -129,7 +129,7 @@ export default function TeamMembers({ teamId }: TeamMembersProps) {
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden shadow-sm">
             <div className="px-8 py-6 border-b border-[#E2E8F0] flex justify-between items-center bg-[#F9FAFB]">
-              <h3 className="text-[10px] font-black text-[#64748B] uppercase tracking-widest">Active Members</h3>
+              <h3 className="text-[10px] font-black text-[#475569] uppercase tracking-widest">Active Members</h3>
               <span className="bg-[#4F46E5]/10 text-[#4F46E5] px-2 py-1 rounded text-[10px] font-black">{members.length} Total</span>
             </div>
             <div className="divide-y divide-[#E2E8F0]">
@@ -140,7 +140,7 @@ export default function TeamMembers({ teamId }: TeamMembersProps) {
                       {member.photoURL ? (
                         <img src={member.photoURL} alt={member.displayName} className="w-full h-full object-cover" />
                       ) : (
-                        <UserIcon className="w-6 h-6 text-[#64748B]" />
+                        <UserIcon className="w-6 h-6 text-[#475569]" />
                       )}
                     </div>
                     <div>
@@ -148,13 +148,13 @@ export default function TeamMembers({ teamId }: TeamMembersProps) {
                         <h4 className="text-sm font-black text-[#0F172A] uppercase tracking-tight group-hover:text-[#4F46E5] transition-colors">{member.displayName}</h4>
                         {member.uid === user?.uid && <span className="text-[8px] font-black bg-[#4F46E5] text-white px-1.5 py-0.5 rounded uppercase">You</span>}
                       </div>
-                      <p className="text-xs font-medium text-[#64748B]">{member.email}</p>
+                      <p className="text-xs font-medium text-[#475569]">{member.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${member.role === 'admin' ? 'bg-[#4F46E5]/10' : 'bg-[#F1F5F9]'}`}>
-                      <Shield className={`w-3 h-3 ${member.role === 'admin' ? 'text-[#4F46E5]' : 'text-[#64748B]'}`} />
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${member.role === 'admin' ? 'text-[#4F46E5]' : 'text-[#64748B]'}`}>
+                      <Shield className={`w-3 h-3 ${member.role === 'admin' ? 'text-[#4F46E5]' : 'text-[#475569]'}`} />
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${member.role === 'admin' ? 'text-[#4F46E5]' : 'text-[#475569]'}`}>
                         {member.role}
                       </span>
                     </div>

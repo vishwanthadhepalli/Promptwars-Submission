@@ -77,30 +77,36 @@ const Reports: React.FC<{ data: any }> = ({ data }) => {
     <div className="space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Intelligence Reports</h1>
-          <p className="text-[#706E6B] mt-1">Instant, deep-dive analysis of your team's progress.</p>
+          <h1 className="text-3xl font-black tracking-tight text-[#0F172A]">Intelligence Reports</h1>
+          <p className="text-[#475569] mt-1 font-bold uppercase text-[10px] tracking-widest">Instant, deep-dive analysis of your team's progress.</p>
         </div>
-        <button className="flex items-center gap-2 border border-[#E5E1DA] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#F3F0EC] transition-colors">
-          <FileDown className="w-4 h-4" />
+        <button 
+          aria-label="Export report to PDF"
+          className="flex items-center gap-2 border border-[#E5E1DA] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#F3F0EC] transition-colors focus:ring-2 focus:ring-[#1A1A1A] outline-none"
+        >
+          <FileDown className="w-4 h-4" aria-hidden="true" />
           Export to PDF
         </button>
       </header>
 
       <div className="bg-white border border-[#E5E1DA] rounded-3xl p-6 shadow-sm">
         <div className="relative">
+          <label htmlFor="report-query" className="sr-only">Ask for a customized report</label>
           <input 
+            id="report-query"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="e.g. 'Create a weekly progress report for stakeholders'..." 
-            className="w-full bg-[#F3F0EC] border-none rounded-2xl py-4 pl-12 pr-12 focus:ring-1 focus:ring-[#1A1A1A]"
+            className="w-full bg-[#F3F0EC] border-none rounded-2xl py-4 pl-12 pr-12 focus:ring-1 focus:ring-[#1A1A1A] text-[#0F172A] placeholder-[#475569]"
           />
-          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" aria-hidden="true" />
           <button 
             disabled={loading}
             onClick={handleGenerate}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-[#1A1A1A] text-white rounded-xl hover:scale-105 transition-transform"
+            aria-label="Generate AI Report"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-[#1A1A1A] text-white rounded-xl hover:scale-105 transition-transform disabled:opacity-50"
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" aria-hidden="true" />}
           </button>
         </div>
       </div>

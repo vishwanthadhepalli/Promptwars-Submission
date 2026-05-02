@@ -140,6 +140,7 @@ export default function App() {
                 <button 
                   onClick={handleSeedData}
                   disabled={isSeeding}
+                  aria-label="Seed sample data into your workspace"
                   className="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-lg font-black text-xs uppercase tracking-widest flex items-center gap-2 border border-white/10"
                 >
                   {isSeeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
@@ -148,6 +149,7 @@ export default function App() {
               )}
               <button 
                 onClick={() => setIsQuickIntakeOpen(true)}
+                aria-label="Open AI Quick Intake"
                 className="bg-[#4F46E5] text-white px-6 py-2 rounded-lg font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-xl shadow-blue-900/40"
               >
                 <Sparkles className="w-4 h-4" /> AI Intake
@@ -160,10 +162,10 @@ export default function App() {
           ) : (
             <>
               {tasks.length === 0 ? (
-                <div className="h-64 flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-[#E2E8F0] rounded-xl text-[#64748B]">
+                <div className="h-64 flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-[#E2E8F0] rounded-xl text-[#475569]">
                   <Database className="w-12 h-12 mb-4 opacity-20" />
                   <p className="font-bold uppercase tracking-widest text-xs">No active tasks found in the cloud</p>
-                  <button onClick={handleSeedData} className="mt-4 text-[#4F46E5] font-black text-[10px] uppercase underline">Quick Start with Sample Data</button>
+                  <button onClick={handleSeedData} className="mt-4 text-[#4F46E5] font-black text-[10px] uppercase underline outline-none focus-visible:ring-2 focus-visible:ring-[#4F46E5]">Quick Start with Sample Data</button>
                 </div>
               ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -214,7 +216,7 @@ export default function App() {
             <Sparkles className="w-8 h-8 text-[#4F46E5]" />
           </div>
           <h2 className="text-2xl font-black text-[#0F172A] mb-2 uppercase tracking-tight">Collaborative Workspace</h2>
-          <p className="text-[#64748B] max-w-sm text-sm font-medium leading-relaxed">The real-time collaborative workspace is currently being optimized for high-concurrency workloads. Expected deployment: Q3 2026.</p>
+          <p className="text-[#475569] max-w-sm text-sm font-medium leading-relaxed">The real-time collaborative workspace is currently being optimized for high-concurrency workloads. Expected deployment: Q3 2026.</p>
         </div>
       )}
 

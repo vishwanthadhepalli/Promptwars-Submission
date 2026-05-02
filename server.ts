@@ -29,8 +29,12 @@ async function startServer() {
       const { prompt, schema } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
       
-      if (!apiKey) {
-        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
+      if (!apiKey || apiKey === "YOUR_API_KEY_HERE" || apiKey.length < 10) {
+        console.error("Critical: GEMINI_API_KEY is not set or is invalid.");
+        return res.status(500).json({ 
+          error: "GEMINI_API_KEY is misconfigured. Please set a valid API key in the 'Settings' menu.",
+          tip: "Visit https://aistudio.google.com/app/apikey to get a key."
+        });
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -47,6 +51,15 @@ async function startServer() {
       res.json(JSON.parse(responseText));
     } catch (error: any) {
       console.error("AI Proxy Error:", error);
+      
+      // Specific detection for invalid API keys
+      if (error?.message?.includes("API key not valid") || error?.status === 400) {
+        return res.status(401).json({ 
+          error: "Invalid Gemini API Key.",
+          details: "The API key was rejected. Check your Secrets in the Settings menu."
+        });
+      }
+
       res.status(500).json({ error: error.message || "Failed to process AI request" });
     }
   });

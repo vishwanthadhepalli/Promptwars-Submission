@@ -66,8 +66,10 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
                 key={item.id}
                 id={`nav-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all group ${
-                  isActive ? 'bg-[#F1F5F9] text-[#0F172A]' : 'text-[#64748B] hover:bg-[#F9FAFB] hover:text-[#0F172A]'
+                aria-label={item.label}
+                aria-current={isActive ? 'page' : undefined}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all group outline-none focus-visible:ring-2 focus-visible:ring-[#4F46E5] ${
+                  isActive ? 'bg-[#F1F5F9] text-[#0F172A]' : 'text-[#475569] hover:bg-[#F9FAFB] hover:text-[#0F172A]'
                 }`}
               >
                 <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-[#4F46E5]' : 'group-hover:text-[#4F46E5]'}`} />
@@ -83,7 +85,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
             {isSidebarOpen && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-black uppercase tracking-tight truncate">{user?.displayName}</p>
-                <button onClick={onLogout} className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider hover:text-red-500">Sign out</button>
+                <button onClick={onLogout} className="text-[10px] font-bold text-[#475569] uppercase tracking-wider hover:text-red-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500 rounded">Sign out</button>
               </div>
             )}
           </div>
@@ -95,24 +97,33 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
         {/* Topbar */}
         <header className="h-16 border-bottom border-[#E5E1DA] bg-white flex items-center justify-between px-8 z-10">
           <div className="flex items-center gap-4 flex-1">
-            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-[#F3F0EC] rounded-lg">
-              <Menu className="w-5 h-5 text-[#706E6B]" />
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+              aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+              className="p-2 hover:bg-[#F3F0EC] rounded-lg focus-visible:ring-2 focus-visible:ring-[#1A1A1A] outline-none"
+            >
+              <Menu className="w-5 h-5 text-[#475569]" />
             </button>
             <div className="relative max-w-xl w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A09E9B]" />
+              <label htmlFor="global-search" className="sr-only">Search workspace</label>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#475569]" aria-hidden="true" />
               <input 
+                id="global-search"
                 type="text" 
-                placeholder="Ask Newton... (e.g. 'What is Project Orion's status?')" 
-                className="w-full bg-[#F3F0EC] border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-[#1A1A1A] transition-all"
+                placeholder="Ask Newton... (e.g. 'What is Project Orion\'s status?')" 
+                className="w-full bg-[#F3F0EC] border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-[#1A1A1A] transition-all text-[#1A1A1A] placeholder-[#475569]"
               />
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-[#F3F0EC] rounded-lg relative">
-              <Bell className="w-5 h-5 text-[#706E6B]" />
+            <button aria-label="View notifications" className="p-2 hover:bg-[#F3F0EC] rounded-lg relative focus-visible:ring-2 focus-visible:ring-[#1A1A1A] outline-none">
+              <Bell className="w-5 h-5 text-[#475569]" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <button className="bg-[#1A1A1A] text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-black transition-colors">
+            <button 
+              aria-label="New Quick Intake"
+              className="bg-[#1A1A1A] text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-black transition-colors focus-visible:ring-2 focus-visible:ring-[#4F46E5] outline-none"
+            >
               <Plus className="w-4 h-4" />
               <span>Quick Intake</span>
             </button>

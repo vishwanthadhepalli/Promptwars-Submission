@@ -99,17 +99,25 @@ export const TeamService = {
   },
 
   inviteMember: async (teamId: string, email: string) => {
+    if (!teamId || !email) throw new Error("Team ID and Email are required for invitation");
     // In a real app, you'd create a 'pendingInvites' collection
     // For this demo, we'll simulate the magic link being sent
     // and provide a way for the user to be added to members when they sign in
-    const teamRef = doc(db, 'teams', teamId);
-    const teamSnap = await getDoc(teamRef);
-    const invitedEmails = teamSnap.data().invitedEmails || [];
-    
-    if (!invitedEmails.includes(email)) {
-      await updateDoc(teamRef, {
-        invitedEmails: [...invitedEmails, email]
-      });
+    try {
+      const teamRef = doc(db, 'teams', teamId);
+      const teamSnap = await getDoc(teamRef);
+      if (!teamSnap.exists()) throw new Error("Team not found");
+      
+      const invitedEmails = teamSnap.data()?.invitedEmails || [];
+      
+      if (!invitedEmails.includes(email)) {
+        await updateDoc(teamRef, {
+          invitedEmails: [...invitedEmails, email]
+        });
+      }
+    } catch (error) {
+      console.error("Error inviting member:", error);
+      throw error;
     }
   },
 
