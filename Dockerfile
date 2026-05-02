@@ -1,15 +1,15 @@
-# Use Node.js stage for building and running the app
+# Base image shared across stages
 FROM node:20-slim AS base
 
 # --- Build Stage ---
 FROM base AS build
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install
+# Copy lockfile explicitly for deterministic installs
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copy all files and build the app
+# Copy source (make sure .dockerignore excludes node_modules, .env, dist)
 COPY . .
 RUN npm run build
 
@@ -17,20 +17,24 @@ RUN npm run build
 FROM base AS production
 WORKDIR /app
 
-# Copy package files and install only production dependencies
-COPY package*.json ./
-RUN npm install --omit=dev
+# Use deterministic, production-only install
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-# Copy the built assets from the build stage
+# Copy built assets from build stage
 COPY --from=build /app/dist ./dist
-# Copy the server script
-COPY --from=build /app/server.js ./
 
-# Set environment to production
+# Copy server entry point directly from source context
+COPY server.js ./
+
+# Set environment
 ENV NODE_ENV=production
 
-# The port Cloud Run will listen on
+# Drop root — run as the built-in 'node' user
+USER node
+
+# Cloud Run listens on this port
 EXPOSE 3000
 
-# Start the server
 CMD ["node", "server.js"]
+
