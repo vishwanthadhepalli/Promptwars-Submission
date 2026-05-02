@@ -54,6 +54,7 @@ export interface Task {
   description?: string;
   priority: 'low' | 'medium' | 'high';
   status: 'todo' | 'in-progress' | 'done';
+  startDate?: string;
   dueDate?: string;
   assigneeId?: string;
   assignee?: string;
@@ -116,6 +117,16 @@ export const TaskService = {
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, path);
+    }
+  },
+
+  deleteTask: async (teamId: string, taskId: string) => {
+    const path = `teams/${teamId}/tasks/${taskId}`;
+    try {
+      const taskRef = doc(db, path);
+      await deleteDoc(taskRef);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, path);
     }
   }
 };

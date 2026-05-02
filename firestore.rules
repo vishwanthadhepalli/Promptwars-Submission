@@ -88,7 +88,7 @@ service cloud.firestore {
       allow create: if isMemberOfTeam(teamId) && isValidTask(request.resource.data);
       allow update: if isMemberOfTeam(teamId) && hasTaskAccess(resource.data) && (
         request.resource.data.updatedAt == request.time &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'priority', 'status', 'dueDate', 'assigneeId', 'collaboratorIds', 'tags', 'risk', 'updatedAt'])
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'priority', 'status', 'startDate', 'dueDate', 'assigneeId', 'collaboratorIds', 'tags', 'risk', 'updatedAt'])
       );
       allow delete: if isMemberOfTeam(teamId) && resource.data.creatorId == request.auth.uid;
     }

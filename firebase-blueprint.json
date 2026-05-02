@@ -41,6 +41,7 @@
         "description": { "type": "string" },
         "priority": { "type": "string", "enum": ["low", "medium", "high"] },
         "status": { "type": "string", "enum": ["todo", "in-progress", "done"] },
+        "startDate": { "type": "string" },
         "dueDate": { "type": "string" },
         "assigneeId": { "type": "string" },
         "creatorId": { "type": "string" },

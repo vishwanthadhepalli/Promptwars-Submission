@@ -10,6 +10,7 @@ import Reports from './components/Reports';
 import AIIntake from './components/AIIntake';
 import RegistrationForm from './components/RegistrationForm';
 import TeamMembers from './components/TeamMembers';
+import TaskDetailModal from './components/TaskDetailModal';
 import { useAuth } from './hooks/useFirebase';
 import { TaskService, Task } from './services/taskService';
 import { TeamService } from './services/teamService';
@@ -24,6 +25,7 @@ export default function App() {
   const [teamId, setTeamId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Initialize Workspace/User Data
   useEffect(() => {
@@ -164,9 +166,13 @@ export default function App() {
                   <button onClick={handleSeedData} className="mt-4 text-[#4F46E5] font-black text-[10px] uppercase underline">Quick Start with Sample Data</button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {tasks.map((t, i) => (
-                    <div key={t.id || i} className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
+                    <div 
+                      key={t.id || i} 
+                      onClick={() => setSelectedTask(t)}
+                      className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
+                    >
                       <div className="flex justify-between items-start mb-4">
                         <div className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${
                           t.priority === 'high' ? 'bg-[#FEE2E2] text-[#EF4444]' : 
@@ -208,6 +214,24 @@ export default function App() {
           <h2 className="text-2xl font-black text-[#0F172A] mb-2 uppercase tracking-tight">Collaborative Workspace</h2>
           <p className="text-[#64748B] max-w-sm text-sm font-medium leading-relaxed">The real-time collaborative workspace is currently being optimized for high-concurrency workloads. Expected deployment: Q3 2026.</p>
         </div>
+      )}
+
+      {selectedTask && teamId && (
+        <TaskDetailModal 
+          task={selectedTask}
+          teamId={teamId}
+          onClose={() => setSelectedTask(null)}
+          onUpdate={async (updates) => {
+            if (selectedTask.id) {
+              await TaskService.updateTask(teamId, selectedTask.id, updates);
+            }
+          }}
+          onDelete={async () => {
+            if (selectedTask.id) {
+              await TaskService.deleteTask(teamId, selectedTask.id);
+            }
+          }}
+        />
       )}
     </Layout>
   );
