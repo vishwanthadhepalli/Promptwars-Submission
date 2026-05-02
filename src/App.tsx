@@ -62,13 +62,20 @@ export default function App() {
 
   // Subscribe to Tasks
   useEffect(() => {
+    let isSubscribed = true;
     if (teamId && user) {
+      console.log("Subscribing to tasks for team:", teamId);
       const unsub = TaskService.subscribeToTasks(teamId, user.uid, (fetchedTasks) => {
-        setTasks(fetchedTasks);
+        if (isSubscribed) {
+          setTasks(fetchedTasks);
+        }
       });
-      return () => unsub();
+      return () => {
+        isSubscribed = false;
+        unsub();
+      };
     }
-  }, [teamId, user]);
+  }, [teamId, user?.uid]); // Use uid specifically to avoid unnecessary re-runs if user object changes slightly
 
   if (loading) {
     return (

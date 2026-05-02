@@ -25,11 +25,15 @@ async function startServer() {
 
   // Secure AI Proxy
   app.post("/api/ai/analyze", async (req, res) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s limit
+
     try {
       const { prompt, schema } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
       
       if (!apiKey || apiKey === "YOUR_API_KEY_HERE" || apiKey.length < 10) {
+        clearTimeout(timeoutId);
         console.error("Critical: GEMINI_API_KEY is not set or is invalid.");
         return res.status(500).json({ 
           error: "GEMINI_API_KEY is misconfigured. Please set a valid API key in the 'Settings' menu.",
@@ -46,12 +50,27 @@ async function startServer() {
         }
       });
 
-      const result = await model.generateContent(prompt);
+      // Pass the signal to signal potential cancellation if the SDK supports it 
+      // Note: @google/generative-ai doesn't natively take an AbortSignal in generateContent yet
+      // so we use a Promise.race to enforce the timeout on the server side
+      
+      const aiPromise = model.generateContent(prompt);
+      const result = await Promise.race([
+        aiPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('AbortError')), 15000))
+      ]) as any;
+
+      clearTimeout(timeoutId);
       const responseText = result.response.text();
       res.json(JSON.parse(responseText));
     } catch (error: any) {
+      clearTimeout(timeoutId);
       console.error("AI Proxy Error:", error);
       
+      if (error.message === 'AbortError') {
+        return res.status(504).json({ error: "AI Timeout: The request took too long." });
+      }
+
       // Specific detection for invalid API keys
       if (error?.message?.includes("API key not valid") || error?.status === 400) {
         return res.status(401).json({ 

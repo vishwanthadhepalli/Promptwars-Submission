@@ -37,6 +37,12 @@ export async function analyzeIntake(input: string) {
   }
 
   const result = await response.json();
+  
+  if (!result || !Array.isArray(result.tasks)) {
+    console.error("AI returned malformed data:", result);
+    throw new Error("AI returned malformed data: Expected a task array.");
+  }
+  
   return result.tasks;
 }
 
