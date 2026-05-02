@@ -8,9 +8,12 @@
 }
 
 :root {
-  --bg: #FDFCFB;
-  --ink: #1A1A1A;
-  --muted: #706E6B;
+  --bg: #F9FAFB;
+  --ink: #0F172A;
+  --accent: #4F46E5;
+  --muted: #64748B;
+  --line: #E2E8F0;
+  --risk: #EF4444;
 }
 
 body {
@@ -21,11 +24,12 @@ body {
 
 /* Custom Markdown Styles */
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  letter-spacing: -0.04em;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   color: var(--ink);
+  text-transform: uppercase;
 }
 
 .markdown-body p {

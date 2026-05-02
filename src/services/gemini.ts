@@ -7,26 +7,38 @@ export const geminiModel = "gemini-3-flash-preview";
 export async function analyzeIntake(input: string) {
   const response = await ai.models.generateContent({
     model: geminiModel,
-    contents: `Analyze this messy input and extract task details: "${input}"`,
+    contents: `You are an expert project manager. Analyze this input (could be messy notes, email, or a meeting transcript) and extract a list of actionable tasks. 
+    If there are multiple deliverables mentioned, return multiple tasks. 
+    Notes: "${input}"`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          title: { type: Type.STRING },
-          description: { type: Type.STRING },
-          priority: { type: Type.STRING, enum: ["low", "medium", "high"] },
-          dueDate: { type: Type.STRING },
-          suggestedAssignees: { type: Type.ARRAY, items: { type: Type.STRING } },
-          tags: { type: Type.ARRAY, items: { type: Type.STRING } },
-          dependencies: { type: Type.ARRAY, items: { type: Type.STRING } }
+          tasks: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                description: { type: Type.STRING },
+                priority: { type: Type.STRING, enum: ["low", "medium", "high"] },
+                dueDate: { type: Type.STRING },
+                assignee: { type: Type.STRING },
+                tags: { type: Type.ARRAY, items: { type: Type.STRING } },
+                dependencies: { type: Type.ARRAY, items: { type: Type.STRING } }
+              },
+              required: ["title", "priority"]
+            }
+          }
         },
-        required: ["title", "priority"]
+        required: ["tasks"]
       }
     }
   });
 
-  return JSON.parse(response.text);
+  const parsed = JSON.parse(response.text);
+  return parsed.tasks;
 }
 
 export async function generateDailyBriefing(tasks: any[], docs: any[]) {

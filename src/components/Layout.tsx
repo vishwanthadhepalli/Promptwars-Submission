@@ -11,7 +11,8 @@ import {
   Plus,
   Bell,
   Menu,
-  X
+  X,
+  User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -30,6 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'tasks', label: 'Tasks', icon: CheckSquare },
     { id: 'workspace', label: 'Workspace', icon: FileText },
+    { id: 'team', label: 'Team', icon: User },
     { id: 'reports', label: 'Reports', icon: BarChart3 },
     { id: 'risks', label: 'Risk Oracle', icon: AlertCircle },
     { id: 'automation', label: 'Workflow', icon: Zap },
@@ -40,25 +42,22 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
       {/* Sidebar */}
       <motion.aside 
         initial={false}
-        animate={{ width: isSidebarOpen ? 260 : 80 }}
-        className="border-r border-[#E5E1DA] bg-white flex flex-col overflow-hidden"
+        animate={{ width: isSidebarOpen ? 280 : 80 }}
+        className="border-r border-[#E2E8F0] bg-white flex flex-col overflow-hidden"
       >
-        <div className="p-6 flex items-center justify-between">
+        <div className="p-8 flex items-center justify-between">
           {isSidebarOpen ? (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#1A1A1A] rounded flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
-              </div>
-              <span className="font-bold text-xl tracking-tight">Newton</span>
+            <div className="brand text-2xl font-black tracking-tighter text-[#0F172A]">
+              NEWTON<span className="text-[#4F46E5]">.</span>
             </div>
           ) : (
-            <div className="w-8 h-8 bg-[#1A1A1A] rounded flex items-center justify-center mx-auto">
-              <span className="text-white font-bold text-lg">N</span>
+            <div className="brand text-2xl font-black tracking-tighter text-[#0F172A] mx-auto">
+              N<span className="text-[#4F46E5]">.</span>
             </div>
           )}
         </div>
 
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-4 space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -67,24 +66,24 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
                 key={item.id}
                 id={`nav-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors group ${
-                  isActive ? 'bg-[#F3F0EC] text-[#1A1A1A]' : 'text-[#706E6B] hover:bg-[#F9F8F6] hover:text-[#1A1A1A]'
+                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all group ${
+                  isActive ? 'bg-[#F1F5F9] text-[#0F172A]' : 'text-[#64748B] hover:bg-[#F9FAFB] hover:text-[#0F172A]'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-[#1A1A1A]' : 'group-hover:text-[#1A1A1A]'}`} />
-                {isSidebarOpen && <span className="font-medium">{item.label}</span>}
+                <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-[#4F46E5]' : 'group-hover:text-[#4F46E5]'}`} />
+                {isSidebarOpen && <span className="font-bold text-xs uppercase tracking-widest">{item.label}</span>}
               </button>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#E5E1DA]">
-          <div className="flex items-center gap-3">
-            <img src={user?.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-[#E5E1DA]" />
+        <div className="p-6 border-t border-[#E2E8F0]">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <img src={user?.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-[#E2E8F0] flex-shrink-0" />
             {isSidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user?.displayName}</p>
-                <button onClick={onLogout} className="text-xs text-[#706E6B] hover:text-red-500">Sign out</button>
+                <p className="text-xs font-black uppercase tracking-tight truncate">{user?.displayName}</p>
+                <button onClick={onLogout} className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider hover:text-red-500">Sign out</button>
               </div>
             )}
           </div>

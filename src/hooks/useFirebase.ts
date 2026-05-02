@@ -1,27 +1,42 @@
 import { useState, useEffect } from 'react';
 import { auth, db } from '../lib/firebase';
-import { onAuthStateChanged, User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { 
+  onAuthStateChanged, 
+  User, 
+  GoogleAuthProvider, 
+  signInWithPopup,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink
+} from 'firebase/auth';
+import { doc, onSnapshot, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (u) => {
-      if (u) {
-        // Sync user to firestore
-        const userRef = doc(db, 'users', u.uid);
-        const snap = await getDoc(userRef);
-        if (!snap.exists()) {
-          await setDoc(userRef, {
-            displayName: u.displayName,
-            email: u.email,
-            photoURL: u.photoURL,
-            teamIds: []
-          });
+    // Handle Magic Link completion
+    const handleEmailLink = async () => {
+      if (isSignInWithEmailLink(auth, window.location.href)) {
+        let email = window.localStorage.getItem('emailForSignIn');
+        if (!email) {
+          email = window.prompt('Please provide your email for confirmation');
+        }
+        if (email) {
+          try {
+            await signInWithEmailLink(auth, email, window.location.href);
+            window.localStorage.removeItem('emailForSignIn');
+          } catch (error) {
+            console.error('Error signing in with email link', error);
+          }
         }
       }
+    };
+
+    handleEmailLink();
+
+    return onAuthStateChanged(auth, async (u) => {
       setUser(u);
       setLoading(false);
     });
@@ -32,9 +47,18 @@ export function useAuth() {
     return signInWithPopup(auth, provider);
   };
 
+  const sendMagicLink = async (email: string) => {
+    const actionCodeSettings = {
+      url: window.location.origin,
+      handleCodeInApp: true,
+    };
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    window.localStorage.setItem('emailForSignIn', email);
+  };
+
   const logout = () => auth.signOut();
 
-  return { user, loading, loginWithGoogle, logout };
+  return { user, loading, loginWithGoogle, sendMagicLink, logout };
 }
 
 export function useTeamData(teamId: string | null) {

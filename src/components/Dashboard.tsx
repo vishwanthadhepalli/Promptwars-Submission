@@ -23,25 +23,25 @@ const Dashboard: React.FC<{ tasks: any[]; docs: any[] }> = ({ tasks, docs }) => 
   }, [tasks.length, docs.length]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 max-w-6xl mx-auto">
       <header>
-        <h1 className="text-4xl font-bold tracking-tight">Welcome back, Newton.</h1>
-        <p className="text-[#706E6B] mt-2">Here is what your team achieved since yesterday.</p>
+        <h1 className="text-6xl font-black tracking-tighter text-[#0F172A]">WORKSPACE OVERVIEW<span className="text-[#4F46E5]">.</span></h1>
+        <p className="text-[#64748B] font-bold uppercase tracking-widest text-xs mt-4">Precision insights from Gemini Agent</p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Daily Synthesis */}
-        <div className="lg:col-span-2 bg-[#1A1A1A] text-white rounded-3xl p-8 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-40 transition-opacity">
-            <Zap className="w-32 h-32 text-purple-400" />
+        <div className="lg:col-span-2 bg-[#0F172A] text-white rounded-xl p-10 relative overflow-hidden group shadow-2xl shadow-blue-900/10">
+          <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Zap className="w-48 h-48 text-white" />
           </div>
           <div className="relative z-10 flex flex-col h-full">
-            <div className="flex items-center gap-2 mb-6">
-              <Sparkles className="w-5 h-5 text-purple-400" />
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#A09E9B]">Predictive Briefing</span>
+            <div className="flex items-center gap-2 mb-8">
+              <Sparkles className="w-5 h-5 text-[#4F46E5]" />
+              <span className="text-xs font-black uppercase tracking-[0.3em] text-[#64748B]">DAILY SYNTHESIZER</span>
             </div>
             
-            <div className="flex-1 text-xl leading-relaxed prose prose-invert max-w-none">
+            <div className="flex-1 text-lg font-medium leading-relaxed prose prose-invert max-w-none">
               {loading ? (
                 <div className="animate-pulse space-y-4">
                   <div className="h-4 bg-white/10 rounded w-3/4"></div>
@@ -55,38 +55,45 @@ const Dashboard: React.FC<{ tasks: any[]; docs: any[] }> = ({ tasks, docs }) => 
               )}
             </div>
 
-            <button className="mt-8 flex items-center gap-2 text-sm font-semibold hover:gap-4 transition-all w-fit">
-              View Detailed Timeline <ArrowRight className="w-4 h-4" />
+            <button className="mt-10 flex items-center gap-3 text-xs font-black uppercase tracking-widest hover:gap-6 transition-all w-fit bg-[#4F46E5] px-6 py-3 rounded-lg shadow-lg">
+              Open Timeline <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Priority Stats */}
-        <div className="space-y-6">
-          <div className="bg-white border border-[#E5E1DA] rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <Target className="w-4 h-4 text-red-500" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#A09E9B]">Active Focus</span>
+        <div className="space-y-8">
+          <div className="bg-white border border-[#E2E8F0] rounded-xl p-8 shadow-sm">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">CRITICAL FOCUS</span>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {tasks.filter(t => t.priority === 'high').slice(0, 3).map((task, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#F9F8F6] transition-colors cursor-pointer border border-transparent hover:border-[#E5E1DA]">
-                  <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5 flex-shrink-0" />
-                  <p className="text-sm font-medium">{task.title}</p>
+                <div key={i} className="group cursor-pointer">
+                  <div className="flex justify-between items-center mb-1">
+                    <p className="text-sm font-black uppercase tracking-tight group-hover:text-[#4F46E5] transition-colors">{task.title}</p>
+                    <span className="text-[10px] font-black text-[#EF4444]">{task.risk || '0%'}</span>
+                  </div>
+                  <div className="h-1 bg-[#F1F5F9] w-full rounded-full overflow-hidden">
+                    <div className="h-full bg-[#4F46E5] rounded-full transition-all duration-1000" style={{ width: task.risk || '10%' }} />
+                  </div>
                 </div>
               ))}
               {tasks.filter(t => t.priority === 'high').length === 0 && (
-                <p className="text-sm text-[#A09E9B] italic">No high priority tasks currently.</p>
+                <p className="text-sm text-[#64748B] italic">All critical path items are clear.</p>
               )}
             </div>
           </div>
 
-          <div className="bg-[#FDF1F1] border border-[#F5DCDC] rounded-3xl p-6 shadow-sm">
+          <div className="bg-[#FEF2F2] border border-[#FEE2E2] rounded-xl p-8">
              <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-4 h-4 text-red-600" />
-              <span className="text-xs font-bold uppercase tracking-wider text-red-600">Priority Risks</span>
+              <AlertTriangle className="w-4 h-4 text-[#EF4444]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#EF4444]">RISK ORACLE</span>
             </div>
-            <p className="text-sm text-red-800 font-medium">Alice is currently over-capacity. Consider reassigning 'Feature X' to Bob.</p>
+            <p className="text-[28px] font-black tracking-tighter text-[#EF4444] mb-2 leading-none">WORKLOAD OVERFLOW</p>
+            <p className="text-xs text-[#991B1B] font-bold leading-relaxed">
+              Predictive engine detected a 72% probability of delay in Project Orion due to resource contention.
+            </p>
           </div>
         </div>
       </div>
