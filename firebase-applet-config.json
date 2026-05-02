@@ -1,0 +1,10 @@
+{
+  "projectId": "freddyai-customer-insight",
+  "appId": "1:765920917177:web:09cf9ffb2a9ffe07504d68",
+  "apiKey": "AIzaSyCu3vDUi5SOIyMkbUZGdxWms3_AdAqZNIw",
+  "authDomain": "freddyai-customer-insight.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-f01925ae-4626-4193-b7e2-5861ba43ae44",
+  "storageBucket": "freddyai-customer-insight.firebasestorage.app",
+  "messagingSenderId": "765920917177",
+  "measurementId": ""
+}

@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isTeamMember(teamId) {
+      return isSignedIn() && exists(/databases/$(database)/documents/teams/$(teamId)) && request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.members;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Users
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId);
+    }
+
+    // Teams
+    match /teams/{teamId} {
+      allow read: if isSignedIn() && (request.auth.uid in resource.data.members);
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && (request.auth.uid in resource.data.members);
+    }
+
+    // Team Sub-collections
+    match /teams/{teamId}/tasks/{taskId} {
+      allow read, write: if isTeamMember(teamId);
+    }
+
+    match /teams/{teamId}/documents/{docId} {
+      allow read, write: if isTeamMember(teamId);
+    }
+
+    match /teams/{teamId}/insights/{insightId} {
+      allow read: if isTeamMember(teamId);
+      allow write: if isTeamMember(teamId); // In a real app, only system service would write, but for this demo/setup we allow members.
+    }
+  }
+}

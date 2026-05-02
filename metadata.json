@@ -1,0 +1,13 @@
+{
+  "name": "Newton Tasks",
+  "description": "An AI-powered team task management application featuring intelligent intake, semantic search, and proactive workload risk analysis.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "AI-powered Task Triage",
+    "Real-time Collaboration",
+    "Predictive Workload Analysis",
+    "Agentic Workflow Automation"
+  ]
+}
