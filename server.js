@@ -11,6 +11,11 @@ const PORT = process.env.PORT || 3000;
 // Serve static files from the 'dist' directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// Health check endpoint for Docker/Cloud Run
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Handle SPA routing - send all requests to index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
